@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<meta name="referrer" content="no-referrer">
+<title>Hello Food</title>
+<style>
+ html,body{margin:0;height:100%;background:#fff;color:#1d1d1f;font:16px -apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
+ main{min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:24px;box-sizing:border-box;text-align:center}
+ a{color:#0071e3}
+</style>
+</head>
+<body>
+<main>
+ <p>Opening Hello Food…</p>
+ <p><a id="go" href="https://hellofoodja.com/en/">Continue</a></p>
+</main>
+<script>
+/* Email button links land here, record the click with the Hello Food relay, then open the real page.
+   The relay is called signed-out (credentials omitted): Google can't open script links for people
+   signed in to several Google accounts, but a signed-out call always works. */
+(function(){
+ var RELAY='https://script.google.com/macros/s/AKfycbzkOa5A2SAA6848ylocuHVmF1nSRQ6J7v3sJdI7HJbeX2iQWy4WkvdZy0p3VYVQQ80S9g/exec';
+ var HOME={JM:'https://hellofoodja.com/en/',TT:'https://hellofoodtt.com/en/'};
+ // Only Hello Food's own sites and app stores, so this page can't be used to send people anywhere else.
+ var ALLOWED=/(^|\.)(hellofoodja\.com|hellofoodtt\.com|apps\.apple\.com|play\.google\.com|instagram\.com|facebook\.com|x\.com|twitter\.com)$/i;
+ var p=new URLSearchParams(location.search),market=(p.get('market')||'JM').toUpperCase(),to=HOME[market]||HOME.JM;
+ try{var u=new URL(p.get('to')||'');if(u.protocol==='https:'&&ALLOWED.test(u.hostname))to=u.href;}catch(e){}
+ document.getElementById('go').href=to;
+ var done=false;function go(){if(done)return;done=true;location.replace(to);}
+ var q=new URLSearchParams();['event','market','campaign','email','link'].forEach(function(k){if(p.get(k))q.set(k,p.get(k));});
+ if(!q.get('event'))q.set('event','CLICK');
+ if(q.get('campaign')&&q.get('email')){
+  try{fetch(RELAY+'?'+q.toString(),{mode:'no-cors',credentials:'omit',keepalive:true,cache:'no-store'}).then(go,go);}catch(e){go();}
+  setTimeout(go,2500);
+ }else go();
+})();
+</script>
+</body>
+</html>
