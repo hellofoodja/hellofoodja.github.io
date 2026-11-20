@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<meta name="referrer" content="no-referrer">
+<title>Unsubscribe · Hello Food Jamaica</title>
+<style>
+ html,body{margin:0;min-height:100%;background:#f5f5f7;color:#1d1d1f;font:17px -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+ main{min-height:100vh;display:grid;place-items:center;padding:24px;box-sizing:border-box}
+ .card{background:#fff;border-radius:22px;padding:40px;max-width:440px;width:100%;box-sizing:border-box;box-shadow:0 2px 12px rgba(0,0,0,.04);display:flex;flex-direction:column;gap:16px;text-align:center}
+ h1{font-size:1.8rem;font-weight:600;letter-spacing:-.02em;margin:0}
+ p{margin:0;color:#6e6e73;line-height:1.5}
+ button{border:0;border-radius:980px;background:#257d59;color:#fff;font:inherit;font-weight:500;padding:13px 24px;cursor:pointer;min-height:48px}
+ button:hover{background:#1f6a4b}button[disabled]{opacity:.5;cursor:default}
+ a{color:#257d59}
+</style>
+</head>
+<body>
+<main><div class="card" id="card">
+ <h1>Unsubscribe from Hello Food emails?</h1>
+ <p>You won’t get promotional emails from Hello Food, Burger King, Popeyes, Little Caesars or Krispy Kreme on Hello Food Jamaica any more.</p>
+ <button id="yes" type="button">Unsubscribe me</button>
+ <p><a href="https://hellofoodja.com/en/">No thanks, take me to Hello Food</a></p>
+</div></main>
+<script>
+/* One click, no typing. The button is there on purpose: email security scanners open every link,
+   and without the button they would unsubscribe people by accident. The request goes through the
+   Hello Food click relay (signed-out); the CRM checks the signature and blocks the address within a minute. */
+(function(){
+ var RELAY='https://script.google.com/macros/s/AKfycbx3Mk5LbvmaGoVFfgknopRGkPqkrz6UrSMSsuGUoHm6iRDQQJNfZvEb2HttW726C9Q6Xg/exec';
+ var p=new URLSearchParams(location.search),campaign=p.get('campaign')||'',email=(p.get('email')||'').trim().toLowerCase(),sig=p.get('s')||'';
+ var card=document.getElementById('card'),yes=document.getElementById('yes');
+ function done(title,text){card.innerHTML='';var h=document.createElement('h1');h.textContent=title;var t=document.createElement('p');t.textContent=text;card.append(h,t);}
+ if(!/^HF_JM_[A-Za-z0-9_]+$/.test(campaign)||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)||!/^[A-Za-z0-9]{16}$/.test(sig)){done('This link isn’t complete','Use the Unsubscribe link at the bottom of one of our emails.');return;}
+ yes.onclick=function(){
+  yes.disabled=true;yes.textContent='Unsubscribing…';
+  var q=new URLSearchParams({event:'CLICK',market:'JM',campaign:campaign,email:email,link:'UNSUB_'+sig});
+  var finish=function(){done('You’re unsubscribed','You won’t get promotional emails from us any more. It can take a few minutes for any email already on its way.');};
+  try{fetch(RELAY+'?'+q.toString(),{mode:'no-cors',credentials:'omit',keepalive:true,cache:'no-store'}).then(finish,function(){yes.disabled=false;yes.textContent='Try again';});}
+  catch(e){yes.disabled=false;yes.textContent='Try again';}
+ };
+})();
+</script>
+</body>
+</html>
